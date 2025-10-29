@@ -1,0 +1,37 @@
+(function (window, undefined) {
+  // 插件初始化
+  window.Asc.plugin.init = function () {
+    console.log("✅ Highlight plugin ready");
+  };
+
+  // 接收来自外部（React）的消息
+  window.Asc.plugin.onExternalMessage = function (message) {
+    if (message && message.type === "highlight") {
+      const keyword = message.text?.trim();
+      if (keyword) {
+        highlightText(keyword);
+      }
+    }
+  };
+
+  function highlightText(keyword) {
+    console.log("🔍 高亮关键词:", keyword);
+
+    window.Asc.plugin.executeMethod("FindText", [keyword], function (found) {
+      if (found && found.length > 0) {
+        window.Asc.plugin.executeMethod("SelectText", [keyword]);
+        window.Asc.plugin.executeMethod("ApplyStyle", [
+          { backgroundColor: "#ffff00" },
+        ]);
+        console.log("✅ 已高亮:", keyword);
+      } else {
+        console.warn("未找到匹配:", keyword);
+      }
+    });
+  }
+
+  // 插件退出（系统按钮）
+  window.Asc.plugin.button = function () {
+    this.executeCommand("close", "");
+  };
+})(window, undefined);
